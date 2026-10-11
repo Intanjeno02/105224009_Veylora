@@ -1,7 +1,8 @@
-# DFD awal — Personal Security Assistant
+# DFD awal — Veylora Personal Security Assistant
 Diagram ini menggambarkan entitas eksternal, proses utama, data store, dan aliran data pada aplikasi Veylora Personal Security Assistant.
 
-DFD Awal Veylora(dfd-awal.png)
+![DFD Awal Veylora](dfd-awal.png)
+
 ## 1. Tujuan
 
 Diagram ini menggambarkan interaksi antara pengguna dan
