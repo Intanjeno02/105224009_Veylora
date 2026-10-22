@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Account } from "@/data/account";
 import { getAccounts, saveAccounts } from "@/lib/account-storage";
+import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 import AccountCard from "@/components/AccountCard";
 import SearchInput from "@/components/SearchInput";
 
@@ -21,18 +22,20 @@ const emptyForm: AccountForm = {
   url: "",
   category: "Lainnya",
 };
+const EMPTY_ACCOUNTS: Account[] = [];
+const ACCOUNTS_STORAGE_KEY = "personal-security-accounts";
 
 export default function VaultPage() {
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const { value: accounts } = useLocalStorageValue(
+    ACCOUNTS_STORAGE_KEY,
+    EMPTY_ACCOUNTS,
+    getAccounts
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<AccountForm>(emptyForm);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  useEffect(() => {
-    setAccounts(getAccounts());
-  }, []);
 
   const filteredAccounts = accounts.filter((account) => {
     const query = searchQuery.toLowerCase();
@@ -96,7 +99,6 @@ export default function VaultPage() {
 
     try {
       saveAccounts(updatedAccounts);
-      setAccounts(updatedAccounts);
       setForm(emptyForm);
       setShowForm(false);
       setSuccess("Akun berhasil ditambahkan.");
@@ -112,7 +114,6 @@ export default function VaultPage() {
 
     try {
       saveAccounts(updatedAccounts);
-      setAccounts(updatedAccounts);
       setSuccess("Akun berhasil dihapus.");
       setError("");
     } catch {
@@ -121,18 +122,18 @@ export default function VaultPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#f7f5fb] px-4 py-8 text-slate-800 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="mb-2 text-sm text-blue-400">
+            <p className="mb-2 text-sm font-semibold text-purple-700">
               Personal Security Assistant
             </p>
 
-            <h1 className="text-3xl font-bold">Vault</h1>
+            <h1 className="text-3xl font-bold text-purple-950">Vault</h1>
 
-            <p className="mt-2 text-sm text-zinc-400">
-              Kelola informasi akun digital kamu.
+            <p className="mt-2 text-sm text-purple-900/60">
+              Kelola informasi akun digital kamu dengan aman.
             </p>
           </div>
 
@@ -143,7 +144,7 @@ export default function VaultPage() {
               setError("");
               setSuccess("");
             }}
-            className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="rounded-xl bg-purple-700 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-purple-700/20 transition hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
           >
             {showForm ? "Batal" : "+ Tambah Akun"}
           </button>
@@ -151,12 +152,12 @@ export default function VaultPage() {
 
         <section
           aria-label="Daftar akun tersimpan"
-          className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-6"
+          className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-6"
         >
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Akun Tersimpan</h2>
+            <h2 className="text-lg font-bold text-purple-950">Akun Tersimpan</h2>
 
-            <span className="rounded-full bg-zinc-800 px-3 py-1 text-sm text-zinc-300">
+            <span className="rounded-full bg-purple-50 border border-purple-200 px-3 py-1 text-sm font-medium text-purple-800">
               {accounts.length} akun
             </span>
           </div>
@@ -165,11 +166,11 @@ export default function VaultPage() {
             <form
               onSubmit={handleSubmit}
               noValidate
-              className="mb-8 space-y-5 rounded-xl border border-zinc-700 bg-zinc-950 p-5"
+              className="mb-8 space-y-5 rounded-2xl border border-purple-200 bg-[#fbf9fe] p-5 sm:p-6 shadow-sm"
             >
-              <h3 className="text-lg font-semibold">Tambah Akun Baru</h3>
+              <h3 className="text-lg font-bold text-purple-950">Tambah Akun Baru</h3>
 
-              <p className="text-sm text-amber-300">
+              <p className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 font-medium">
                 Prototipe ini belum mengenkripsi kredensial. Jangan masukkan
                 password asli.
               </p>
@@ -178,7 +179,7 @@ export default function VaultPage() {
                 <div>
                   <label
                     htmlFor="account-name"
-                    className="mb-2 block text-sm text-zinc-300"
+                    className="mb-2 block text-sm font-medium text-purple-950/80"
                   >
                     Nama layanan *
                   </label>
@@ -192,14 +193,14 @@ export default function VaultPage() {
                       setForm({ ...form, name: event.target.value })
                     }
                     placeholder="Contoh: GitHub"
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-3 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    className="w-full rounded-xl border border-purple-200 bg-white px-3 py-3 text-purple-950 placeholder-purple-900/40 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 shadow-sm transition-all"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="account-username"
-                    className="mb-2 block text-sm text-zinc-300"
+                    className="mb-2 block text-sm font-medium text-purple-950/80"
                   >
                     Username *
                   </label>
@@ -213,14 +214,14 @@ export default function VaultPage() {
                       setForm({ ...form, username: event.target.value })
                     }
                     placeholder="Contoh: rin-dev"
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-3 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    className="w-full rounded-xl border border-purple-200 bg-white px-3 py-3 text-purple-950 placeholder-purple-900/40 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 shadow-sm transition-all"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="account-email"
-                    className="mb-2 block text-sm text-zinc-300"
+                    className="mb-2 block text-sm font-medium text-purple-950/80"
                   >
                     Email *
                   </label>
@@ -235,14 +236,14 @@ export default function VaultPage() {
                       setForm({ ...form, email: event.target.value })
                     }
                     placeholder="nama@example.com"
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-3 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    className="w-full rounded-xl border border-purple-200 bg-white px-3 py-3 text-purple-950 placeholder-purple-900/40 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 shadow-sm transition-all"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="account-url"
-                    className="mb-2 block text-sm text-zinc-300"
+                    className="mb-2 block text-sm font-medium text-purple-950/80"
                   >
                     URL layanan *
                   </label>
@@ -257,14 +258,14 @@ export default function VaultPage() {
                       setForm({ ...form, url: event.target.value })
                     }
                     placeholder="https://github.com"
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-3 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    className="w-full rounded-xl border border-purple-200 bg-white px-3 py-3 text-purple-950 placeholder-purple-900/40 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 shadow-sm transition-all"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="account-category"
-                    className="mb-2 block text-sm text-zinc-300"
+                    className="mb-2 block text-sm font-medium text-purple-950/80"
                   >
                     Kategori
                   </label>
@@ -275,7 +276,7 @@ export default function VaultPage() {
                     onChange={(event) =>
                       setForm({ ...form, category: event.target.value })
                     }
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-3 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    className="w-full rounded-xl border border-purple-200 bg-white px-3 py-3 text-purple-950 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 shadow-sm transition-all"
                   >
                     <option value="Email">Email</option>
                     <option value="Media Sosial">Media Sosial</option>
@@ -287,14 +288,14 @@ export default function VaultPage() {
               </div>
 
               {error && (
-                <p role="alert" className="text-sm text-red-400">
+                <p role="alert" className="text-sm font-medium text-rose-600">
                   {error}
                 </p>
               )}
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 sm:w-auto"
+                className="w-full rounded-xl bg-purple-700 px-5 py-3 font-semibold text-white shadow-sm shadow-purple-700/20 transition hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500/30 sm:w-auto"
               >
                 Simpan Akun
               </button>
@@ -304,14 +305,14 @@ export default function VaultPage() {
           {success && (
             <p
               role="status"
-              className="mb-5 rounded-lg border border-emerald-800 bg-emerald-950/40 p-3 text-sm text-emerald-300"
+              className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium text-emerald-800"
             >
               {success}
             </p>
           )}
 
           {error && !showForm && (
-            <p role="alert" className="mb-5 text-sm text-red-400">
+            <p role="alert" className="mb-5 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-800">
               {error}
             </p>
           )}
@@ -326,16 +327,16 @@ export default function VaultPage() {
           )}
 
           {accounts.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-zinc-700 px-5 py-12 text-center">
+            <div className="rounded-2xl border border-dashed border-purple-200 bg-[#fbf9fe] px-5 py-12 text-center">
               <div aria-hidden="true" className="mb-4 text-4xl">
                 🔐
               </div>
 
-              <h3 className="text-lg font-semibold">
+              <h3 className="text-lg font-bold text-purple-950">
                 Vault kamu masih kosong
               </h3>
 
-              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-zinc-400">
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-purple-900/60">
                 Belum ada akun yang disimpan. Tambahkan akun untuk mulai
                 mengelola informasi digital kamu.
               </p>
@@ -343,13 +344,13 @@ export default function VaultPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(true)}
-                className="mt-5 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="mt-5 rounded-xl bg-purple-700 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-purple-700/20 hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
               >
                 Tambah Akun Pertama
               </button>
             </div>
           ) : filteredAccounts.length === 0 ? (
-            <p className="py-8 text-center text-sm text-zinc-400">
+            <p className="py-8 text-center text-sm text-purple-900/50">
               Akun yang kamu cari tidak ditemukan.
             </p>
           ) : (
@@ -369,7 +370,7 @@ export default function VaultPage() {
                   <button
                     type="button"
                     onClick={() => handleDelete(account.id)}
-                    className="ml-2 text-xs text-red-400 underline hover:text-red-300"
+                    className="ml-2 text-xs font-medium text-rose-600 hover:text-rose-800 hover:underline transition-colors"
                     aria-label={`Hapus akun ${account.name}`}
                   >
                     Hapus akun

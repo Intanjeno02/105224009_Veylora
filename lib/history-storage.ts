@@ -1,3 +1,5 @@
+import { notifyLocalStorageChange } from "@/lib/use-local-storage-value";
+
 export type ScanHistory = {
   id: string;
   url: string;
@@ -43,6 +45,7 @@ export function saveScanHistory(
     STORAGE_KEY,
     JSON.stringify(history)
   );
+  notifyLocalStorageChange(STORAGE_KEY);
 }
 
 export function addScanHistory(
@@ -71,4 +74,5 @@ export function clearScanHistory(): void {
   }
 
   localStorage.removeItem(STORAGE_KEY);
+  notifyLocalStorageChange(STORAGE_KEY);
 }

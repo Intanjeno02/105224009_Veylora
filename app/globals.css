@@ -1,37 +1,21 @@
 @import "tailwindcss";
 
-/* Tema terang sebagai tema default */
 :root {
-  color-scheme: light;
-
-  --background: #ffffff;
-  --foreground: #171717;
-
-  --surface: #f4f4f5;
-  --surface-secondary: #e4e4e7;
-  --border: #d4d4d8;
-
-  --muted: #52525b;
-}
-
-/* Tema gelap ketika class dark aktif */
-:root.dark {
   color-scheme: dark;
 
-  --background: #09090b;
-  --foreground: #ededed;
-
-  --surface: #18181b;
-  --surface-secondary: #27272a;
-  --border: #3f3f46;
-
+  --background: #08070d;
+  --foreground: #f8fafc;
+  --surface: #12111b;
+  --surface-secondary: #191725;
+  --border: rgb(255 255 255 / 10%);
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
   --muted: #a1a1aa;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -44,11 +28,146 @@ html {
 
 body {
   min-height: 100vh;
-  background: var(--background);
+  background:
+    radial-gradient(ellipse 40% 30% at 5% 0%, rgb(79 70 229 / 14%), transparent 80%),
+    radial-gradient(ellipse 35% 35% at 100% 45%, rgb(192 38 211 / 10%), transparent 80%),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
 
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+html.dark main,
+html.dark [class~="bg-[#f7f5fb]"] {
+  background-image:
+    radial-gradient(rgb(255 255 255 / 6%) 1px, transparent 1px),
+    radial-gradient(ellipse 40% 30% at 5% 0%, rgb(79 70 229 / 14%), transparent 80%),
+    radial-gradient(ellipse 35% 35% at 100% 45%, rgb(192 38 211 / 10%), transparent 80%);
+  background-size: 28px 28px, auto, auto;
+}
+
+html.dark [class~="bg-[#f7f5fb]"] {
+  background-color: #08070d !important;
+}
+
+html.dark [class~="bg-[#fbf9fe]"] {
+  background-color: #100e18 !important;
+}
+
+html.dark [class~="bg-white"],
+html.dark [class~="bg-white/95"] {
+  background-color: var(--surface) !important;
+}
+
+html.dark [class*="bg-purple-50"] {
+  background-color: #100e18 !important;
+}
+
+html.dark [class*="bg-purple-100"] {
+  background-color: #191725 !important;
+}
+
+html.dark [class*="bg-purple-200"] {
+  background-color: #252238 !important;
+}
+
+html.dark [class*="bg-rose-50"] {
+  background-color: #2a121b !important;
+}
+
+html.dark [class*="bg-rose-100"] {
+  background-color: #3b1623 !important;
+}
+
+html.dark [class*="bg-amber-50"] {
+  background-color: #281d0b !important;
+}
+
+html.dark [class*="bg-amber-100"] {
+  background-color: #39280d !important;
+}
+
+html.dark [class*="bg-emerald-50"] {
+  background-color: #0c211b !important;
+}
+
+html.dark [class*="bg-emerald-100"] {
+  background-color: #103329 !important;
+}
+
+html.dark [class*="bg-blue-50"] {
+  background-color: #10172b !important;
+}
+
+html.dark [class~="bg-purple-700"] {
+  background-color: transparent !important;
+  background-image: linear-gradient(100deg, #2563eb, #7c3aed 55%, #a21caf) !important;
+}
+
+html.dark [class~="hover:bg-purple-800"]:hover {
+  background-color: transparent !important;
+  background-image: linear-gradient(100deg, #3b82f6, #8b5cf6 55%, #c026d3) !important;
+}
+
+html.dark [class*="border-purple-100"],
+html.dark [class*="border-purple-200"] {
+  border-color: rgb(255 255 255 / 10%) !important;
+}
+
+html.dark [class*="border-rose-200"] {
+  border-color: rgb(251 113 133 / 25%) !important;
+}
+
+html.dark [class*="border-amber-200"] {
+  border-color: rgb(251 191 36 / 25%) !important;
+}
+
+html.dark [class*="border-emerald-200"] {
+  border-color: rgb(52 211 153 / 25%) !important;
+}
+
+html.dark [class*="text-purple-950"] {
+  color: #f8fafc !important;
+}
+
+html.dark [class*="text-purple-900"] {
+  color: #cbd5e1 !important;
+}
+
+html.dark [class*="text-purple-800"],
+html.dark [class*="text-purple-700"] {
+  color: #c4b5fd !important;
+}
+
+html.dark [class*="text-rose-950"],
+html.dark [class*="text-rose-900"],
+html.dark [class*="text-rose-800"],
+html.dark [class*="text-rose-700"] {
+  color: #fda4af !important;
+}
+
+html.dark [class*="text-amber-950"],
+html.dark [class*="text-amber-900"],
+html.dark [class*="text-amber-800"],
+html.dark [class*="text-amber-700"] {
+  color: #fcd34d !important;
+}
+
+html.dark [class*="text-emerald-950"],
+html.dark [class*="text-emerald-900"],
+html.dark [class*="text-emerald-800"],
+html.dark [class*="text-emerald-700"] {
+  color: #6ee7b7 !important;
+}
+
+html.dark [class~="text-slate-800"] {
+  color: #e2e8f0 !important;
+}
+
+html.dark [class~="text-slate-900"] {
+  color: #f8fafc !important;
+}
+
+html.dark ::selection {
+  background: rgb(139 92 246 / 45%);
+  color: #fff;
 }

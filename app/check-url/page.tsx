@@ -147,18 +147,18 @@ export default function CheckUrlPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#f7f5fb] px-4 py-8 text-slate-800 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <header className="mb-8">
-          <p className="mb-2 text-sm font-medium text-blue-400">
+          <p className="mb-2 text-sm font-semibold text-purple-700">
             Personal Security Assistant
           </p>
 
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-3xl font-bold tracking-tight text-purple-950">
             Cek Keamanan URL
           </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400 sm:text-base">
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-purple-900/60 sm:text-base">
             Periksa indikator sederhana pada sebuah tautan sebelum
             membukanya. Hasil pemeriksaan awal ini belum menjamin
             keamanan situs.
@@ -167,22 +167,22 @@ export default function CheckUrlPage() {
 
         <section
           aria-labelledby="url-form-title"
-          className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-8"
+          className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-8"
         >
           <div className="mb-6 flex items-start gap-4">
             <div
               aria-hidden="true"
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-600/15 text-2xl text-blue-400"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-purple-200 bg-purple-50 text-2xl text-purple-700 shadow-sm"
             >
               ⛨
             </div>
 
             <div>
-              <h2 id="url-form-title" className="text-xl font-semibold">
+              <h2 id="url-form-title" className="text-xl font-bold text-purple-950">
                 Periksa tautan
               </h2>
 
-              <p className="mt-1 text-sm text-zinc-300">
+              <p className="mt-1 text-sm text-purple-900/60">
                 Masukkan URL lengkap yang ingin kamu periksa.
               </p>
             </div>
@@ -191,7 +191,7 @@ export default function CheckUrlPage() {
           <form onSubmit={handleSubmit} noValidate>
             <label
               htmlFor="url-input"
-              className="mb-2 block text-sm font-medium text-zinc-200"
+              className="mb-2 block text-sm font-medium text-purple-950/80"
             >
               URL yang akan diperiksa
             </label>
@@ -213,13 +213,13 @@ export default function CheckUrlPage() {
                 placeholder="https://example.com"
                 aria-invalid={Boolean(error)}
                 aria-describedby="url-help url-error"
-                className="min-w-0 flex-1 rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+                className="min-w-0 flex-1 rounded-xl border border-purple-200 bg-[#fbf9fe] px-4 py-3 text-sm text-purple-950 outline-none transition placeholder:text-purple-900/40 focus:border-purple-600 focus:bg-white focus:ring-2 focus:ring-purple-500/20 shadow-sm"
               />
 
               <button
                 type="submit"
                 disabled={isChecking}
-                className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-xl bg-purple-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-purple-700/20 transition hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500/30 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isChecking ? "Memeriksa..." : "Periksa URL"}
               </button>
@@ -227,61 +227,63 @@ export default function CheckUrlPage() {
 
             <p
               id="url-help"
-              className="mt-3 text-xs leading-relaxed text-zinc-300"
+              className="mt-3 text-xs leading-relaxed text-purple-900/60"
             >
               Gunakan URL lengkap dengan awalan http:// atau https://.
               Jangan memasukkan tautan yang berisi informasi login.
             </p>
 
-            <p
-              id="url-error"
-              role="alert"
-              className="mt-3 text-sm text-red-400"
-            >
-              {error}
-            </p>
+            {error && (
+              <p
+                id="url-error"
+                role="alert"
+                className="mt-3 text-sm font-medium text-rose-600"
+              >
+                {error}
+              </p>
+            )}
           </form>
         </section>
 
         <section
           aria-labelledby="result-title"
           aria-live="polite"
-          className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-8"
+          className="mt-6 rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-8"
         >
           <div className="mb-5">
-            <h2 id="result-title" className="text-xl font-semibold">
+            <h2 id="result-title" className="text-xl font-bold text-purple-950">
               Hasil Pemeriksaan
             </h2>
 
-            <p className="mt-1 text-sm text-zinc-300">
+            <p className="mt-1 text-sm text-purple-900/60">
               Hasil simulasi berdasarkan beberapa indikator sederhana.
             </p>
           </div>
 
           {!result ? (
-            <div className="rounded-xl border border-dashed border-zinc-700 px-5 py-12 text-center">
+            <div className="rounded-2xl border border-dashed border-purple-200 bg-[#fbf9fe] px-5 py-12 text-center">
               <div aria-hidden="true" className="mb-4 text-4xl">
                 🔎
               </div>
 
-              <h3 className="font-medium text-zinc-200">
+              <h3 className="font-bold text-purple-950">
                 Belum ada hasil pemeriksaan
               </h3>
 
-              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-zinc-300">
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-purple-900/60">
                 Masukkan URL pada formulir di atas untuk menjalankan
                 simulasi pemeriksaan.
               </p>
             </div>
           ) : (
-            <div className="rounded-xl border border-zinc-700 bg-zinc-950 p-5">
+            <div className="rounded-2xl border border-purple-200 bg-[#fbf9fe] p-5 shadow-sm">
               <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                 <div className="min-w-0">
-                  <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-purple-900/50">
                     URL yang diperiksa
                   </p>
 
-                  <p className="mt-2 break-all text-sm text-zinc-200">
+                  <p className="mt-2 break-all text-sm font-medium text-purple-950 font-mono">
                     {result.url}
                   </p>
                 </div>
@@ -289,8 +291,8 @@ export default function CheckUrlPage() {
                 <span
                   className={`inline-flex w-fit shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${
                     result.status === "Mencurigakan"
-                      ? "border-red-800 bg-red-950/40 text-red-300"
-                      : "border-amber-800 bg-amber-950/40 text-amber-300"
+                      ? "border-rose-200 bg-rose-50 text-rose-700"
+                      : "border-amber-200 bg-amber-50 text-amber-800"
                   }`}
                 >
                   {result.status}
@@ -298,7 +300,7 @@ export default function CheckUrlPage() {
               </div>
 
               <div className="mt-6">
-                <h3 className="font-semibold text-zinc-200">
+                <h3 className="font-bold text-purple-950">
                   Temuan simulasi
                 </h3>
 
@@ -306,11 +308,11 @@ export default function CheckUrlPage() {
                   {result.reasons.map((reason, index) => (
                     <li
                       key={`${index}-${reason}`}
-                      className="flex items-start gap-3 text-sm leading-relaxed text-zinc-400"
+                      className="flex items-start gap-3 text-sm leading-relaxed text-purple-900/80"
                     >
                       <span
                         aria-hidden="true"
-                        className="mt-0.5 text-blue-400"
+                        className="mt-0.5 font-bold text-purple-700"
                       >
                         •
                       </span>
@@ -321,7 +323,7 @@ export default function CheckUrlPage() {
                 </ul>
               </div>
 
-              <p className="mt-6 border-t border-zinc-800 pt-4 text-xs leading-relaxed text-zinc-500">
+              <p className="mt-6 border-t border-purple-100 pt-4 text-xs leading-relaxed text-purple-900/50">
                 Diperiksa pada{" "}
                 {new Date(result.checkedAt).toLocaleString("id-ID")}.
                 Pemeriksaan ini berjalan secara lokal menggunakan aturan
@@ -332,7 +334,7 @@ export default function CheckUrlPage() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="mt-5 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="mt-5 rounded-xl border border-purple-200 bg-white px-4 py-2 text-sm font-semibold text-purple-950 shadow-sm transition hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
               >
                 Periksa URL lain
               </button>
@@ -340,12 +342,12 @@ export default function CheckUrlPage() {
           )}
         </section>
 
-        <aside className="mt-6 rounded-xl border border-amber-900/60 bg-amber-950/20 p-5">
-          <h2 className="font-semibold text-amber-300">
+        <aside className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-5 shadow-sm">
+          <h2 className="font-bold text-amber-900">
             Perhatikan batasan pemeriksaan
           </h2>
 
-          <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+          <p className="mt-2 text-sm leading-relaxed text-amber-800/90">
             URL yang tidak menunjukkan indikator di atas belum tentu aman.
             Deteksi phishing yang sebenarnya membutuhkan analisis lebih
             lanjut, misalnya pemeriksaan reputasi domain dan sumber intelijen

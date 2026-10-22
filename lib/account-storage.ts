@@ -1,4 +1,5 @@
 import type { Account } from "@/data/account";
+import { notifyLocalStorageChange } from "@/lib/use-local-storage-value";
 
 const STORAGE_KEY = "personal-security-accounts";
 
@@ -26,4 +27,5 @@ export function saveAccounts(accounts: Account[]): void {
   }
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts));
+  notifyLocalStorageChange(STORAGE_KEY);
 }

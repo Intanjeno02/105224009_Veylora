@@ -23,7 +23,7 @@ export default function SearchInput({
       <div className="relative">
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-purple-900/50"
         >
           ⌕
         </span>
@@ -34,7 +34,7 @@ export default function SearchInput({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
-          className="w-full rounded-xl border border-zinc-700 bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+          className="w-full rounded-xl border border-purple-200 bg-white py-3 pl-10 pr-4 text-sm text-purple-950 placeholder-purple-900/40 outline-none transition focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 shadow-sm"
         />
       </div>
     </div>

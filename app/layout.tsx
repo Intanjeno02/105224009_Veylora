@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import AppShell from "@/components/AppShell";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,29 +19,6 @@ export const metadata: Metadata = {
     "Simpan kata sandi dengan aman dan cek keamanan link dalam satu aplikasi.",
 };
 
-const themeScript = `
-  (function () {
-    try {
-      var settings = localStorage.getItem("veylora-settings");
-      var theme = settings ? JSON.parse(settings).theme : "dark";
-
-      if (theme !== "light" && theme !== "dark") {
-        theme = "dark";
-      }
-
-      document.documentElement.classList.toggle(
-        "dark",
-        theme === "dark"
-      );
-
-      document.documentElement.style.colorScheme = theme;
-    } catch (error) {
-      document.documentElement.classList.add("dark");
-      document.documentElement.style.colorScheme = "dark";
-    }
-  })();
-`;
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -49,20 +27,13 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: themeScript,
-          }}
-        />
-      </head>
-
-      <body className="min-h-full flex flex-col">
+    <body className="min-h-full">
+      <AppShell>
         {children}
-      </body>
+      </AppShell>
+    </body>
     </html>
   );
 }

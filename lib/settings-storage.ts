@@ -1,6 +1,8 @@
+import { notifyLocalStorageChange } from "@/lib/use-local-storage-value";
+
 export type AppSettings = {
   username: string;
-  theme: "dark" | "light";
+  theme: "dark";
   notifications: boolean;
 };
 
@@ -32,11 +34,7 @@ export function getSettings(): AppSettings {
           ? parsedData.username
           : DEFAULT_SETTINGS.username,
 
-      theme:
-        parsedData.theme === "light" ||
-        parsedData.theme === "dark"
-          ? parsedData.theme
-          : DEFAULT_SETTINGS.theme,
+      theme: DEFAULT_SETTINGS.theme,
 
       notifications:
         typeof parsedData.notifications === "boolean"
@@ -57,4 +55,5 @@ export function saveSettings(settings: AppSettings): void {
     STORAGE_KEY,
     JSON.stringify(settings)
   );
+  notifyLocalStorageChange(STORAGE_KEY);
 }

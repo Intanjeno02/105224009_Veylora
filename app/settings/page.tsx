@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   DEFAULT_SETTINGS,
   getSettings,
@@ -10,18 +10,35 @@ import {
 import {
   clearScanHistory,
 } from "@/lib/history-storage";
+import { useLocalStorageValue } from "@/lib/use-local-storage-value";
+
+const SETTINGS_STORAGE_KEY = "veylora-settings";
 
 export default function SettingsPage() {
-  const [settings, setSettings] =
-    useState<AppSettings>(DEFAULT_SETTINGS);
+  const { value: settings, isLoaded } = useLocalStorageValue(
+    SETTINGS_STORAGE_KEY,
+    DEFAULT_SETTINGS,
+    getSettings
+  );
 
-  const [isLoaded, setIsLoaded] = useState(false);
+  if (!isLoaded) {
+    return (
+      <main className="min-h-screen bg-[#f7f5fb] p-8 font-medium text-purple-950">
+        Memuat pengaturan...
+      </main>
+    );
+  }
+
+  return <SettingsContent initialSettings={settings} />;
+}
+
+function SettingsContent({
+  initialSettings,
+}: {
+  initialSettings: AppSettings;
+}) {
+  const [settings, setSettings] = useState(initialSettings);
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    setSettings(getSettings());
-    setIsLoaded(true);
-  }, []);
 
   function updateSettings(
     key: keyof AppSettings,
@@ -51,15 +68,6 @@ export default function SettingsPage() {
     saveSettings(updatedSettings);
     setSettings(updatedSettings);
 
-    // Terapkan tema ke elemen HTML utama.
-    document.documentElement.classList.toggle(
-      "dark",
-      updatedSettings.theme === "dark"
-    );
-
-    document.documentElement.style.colorScheme =
-      updatedSettings.theme;
-
     setMessage("Pengaturan berhasil disimpan.");
   }
 
@@ -76,27 +84,19 @@ export default function SettingsPage() {
     setMessage("Riwayat pemeriksaan berhasil dihapus.");
   }
 
-  if (!isLoaded) {
-    return (
-      <main className="min-h-screen bg-zinc-950 p-8 text-white">
-        Memuat pengaturan...
-      </main>
-    );
-  }
-
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#f7f5fb] px-4 py-8 text-slate-800 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
         <header className="mb-8">
-          <p className="mb-2 text-sm font-medium text-blue-400">
+          <p className="mb-2 text-sm font-semibold text-purple-700">
             Personal Security Assistant
           </p>
 
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-3xl font-bold tracking-tight text-purple-950">
             Pengaturan
           </h1>
 
-          <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+          <p className="mt-2 text-sm leading-relaxed text-purple-900/60">
             Atur preferensi penggunaan dan privasi Veylora.
           </p>
         </header>
@@ -105,23 +105,23 @@ export default function SettingsPage() {
           {/* Profil pengguna */}
           <section
             aria-labelledby="profile-title"
-            className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-7"
+            className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-7"
           >
             <h2
               id="profile-title"
-              className="text-xl font-semibold"
+              className="text-xl font-bold text-purple-950"
             >
               Profil Pengguna
             </h2>
 
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className="mt-1 text-sm text-purple-900/60">
               Atur nama yang digunakan pada aplikasi.
             </p>
 
             <div className="mt-5">
               <label
                 htmlFor="username"
-                className="mb-2 block text-sm font-medium text-zinc-300"
+                className="mb-2 block text-sm font-medium text-purple-950/80"
               >
                 Nama pengguna
               </label>
@@ -140,7 +140,7 @@ export default function SettingsPage() {
                   )
                 }
                 required
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+                className="w-full rounded-xl border border-purple-200 bg-[#fbf9fe] px-4 py-3 text-sm text-purple-950 outline-none focus:border-purple-600 focus:bg-white focus:ring-2 focus:ring-purple-500/20 shadow-sm transition-all"
               />
             </div>
           </section>
@@ -148,63 +148,38 @@ export default function SettingsPage() {
           {/* Tampilan */}
           <section
             aria-labelledby="appearance-title"
-            className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-7"
+            className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-7"
           >
             <h2
               id="appearance-title"
-              className="text-xl font-semibold"
+              className="text-xl font-bold text-purple-950"
             >
               Tampilan
             </h2>
 
-            <p className="mt-1 text-sm text-zinc-400">
-              Pilih tema tampilan aplikasi.
+            <p className="mt-1 text-sm text-purple-900/60">
+              Tampilan Veylora menggunakan tema gelap secara konsisten.
             </p>
 
-            <div className="mt-5">
-              <label
-                htmlFor="theme"
-                className="mb-2 block text-sm font-medium text-zinc-300"
-              >
-                Tema aplikasi
-              </label>
-
-              <select
-                id="theme"
-                name="theme"
-                value={settings.theme}
-                onChange={(event) =>
-                  updateSettings(
-                    "theme",
-                    event.target.value
-                  )
-                }
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
-              >
-                <option value="dark">Gelap</option>
-                <option value="light">Terang</option>
-              </select>
-
-              <p className="mt-2 text-xs leading-relaxed text-zinc-500">
-                Pilihan tema disimpan, tetapi penerapan tema terang
-                ke seluruh halaman memerlukan penyesuaian CSS global.
-              </p>
+            <div className="mt-5 inline-flex items-center gap-2 rounded-xl border border-violet-400/20 bg-violet-400/10 px-4 py-3 text-sm font-semibold text-violet-200">
+              <span aria-hidden="true" className="text-base">✦</span>
+              Tema Gelap Aktif
             </div>
           </section>
 
           {/* Notifikasi */}
           <section
             aria-labelledby="notification-title"
-            className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-7"
+            className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-7"
           >
             <h2
               id="notification-title"
-              className="text-xl font-semibold"
+              className="text-xl font-bold text-purple-950"
             >
               Notifikasi
             </h2>
 
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className="mt-1 text-sm text-purple-900/60">
               Atur preferensi notifikasi aplikasi.
             </p>
 
@@ -223,22 +198,22 @@ export default function SettingsPage() {
                     event.target.checked
                   )
                 }
-                className="mt-1 h-4 w-4 accent-blue-600 focus:ring-2 focus:ring-blue-400"
+                className="mt-1 h-4 w-4 accent-purple-700 focus:ring-2 focus:ring-purple-500/30"
               />
 
               <span>
-                <span className="block text-sm font-medium text-zinc-200">
+                <span className="block text-sm font-medium text-purple-950">
                   Aktifkan preferensi notifikasi
                 </span>
 
-                <span className="mt-1 block text-sm leading-relaxed text-zinc-400">
+                <span className="mt-1 block text-sm leading-relaxed text-purple-900/60">
                   Simpan pilihan apakah kamu ingin menerima
                   notifikasi dari aplikasi.
                 </span>
               </span>
             </label>
 
-            <p className="mt-3 text-xs leading-relaxed text-zinc-500">
+            <p className="mt-3 text-xs leading-relaxed text-purple-900/50">
               Pengaturan ini belum mengaktifkan notifikasi otomatis.
               Sistem notifikasi perlu diimplementasikan secara terpisah.
             </p>
@@ -247,31 +222,31 @@ export default function SettingsPage() {
           {/* Privasi */}
           <section
             aria-labelledby="privacy-title"
-            className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-7"
+            className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-7"
           >
             <h2
               id="privacy-title"
-              className="text-xl font-semibold"
+              className="text-xl font-bold text-purple-950"
             >
               Privasi Data
             </h2>
 
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className="mt-1 text-sm text-purple-900/60">
               Informasi mengenai penyimpanan data aplikasi.
             </p>
 
-            <div className="mt-5 rounded-xl border border-emerald-900/60 bg-emerald-950/20 p-4">
-              <h3 className="font-medium text-emerald-300">
+            <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+              <h3 className="font-bold text-emerald-900">
                 Penyimpanan lokal
               </h3>
 
-              <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+              <p className="mt-2 text-sm leading-relaxed text-emerald-800/90">
                 Pengaturan dan riwayat pemeriksaan disimpan pada
                 browser yang digunakan. Implementasi ini tidak
                 mengirim data tersebut ke database server.
               </p>
 
-              <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+              <p className="mt-2 text-sm leading-relaxed text-emerald-800/90">
                 Penyimpanan lokal belum tentu terenkripsi. Jangan
                 menyimpan kata sandi asli atau informasi sensitif
                 dalam penyimpanan browser biasa.
@@ -280,21 +255,21 @@ export default function SettingsPage() {
           </section>
 
           {/* Simpan pengaturan */}
-          <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-7">
+          <section className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm sm:p-7">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
-                <h2 className="font-semibold">
+                <h2 className="font-bold text-purple-950">
                   Simpan Perubahan
                 </h2>
 
-                <p className="mt-1 text-sm text-zinc-400">
+                <p className="mt-1 text-sm text-purple-900/60">
                   Simpan preferensi yang sudah kamu pilih.
                 </p>
               </div>
 
               <button
                 type="submit"
-                className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-zinc-900"
+                className="rounded-xl bg-purple-700 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-purple-700/20 transition hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
               >
                 Simpan Pengaturan
               </button>
@@ -304,7 +279,7 @@ export default function SettingsPage() {
               <p
                 role="status"
                 aria-live="polite"
-                className="mt-4 text-sm text-emerald-400"
+                className="mt-4 text-sm font-medium text-emerald-700"
               >
                 {message}
               </p>
@@ -315,16 +290,16 @@ export default function SettingsPage() {
         {/* Hapus riwayat */}
         <section
           aria-labelledby="history-delete-title"
-          className="mt-6 rounded-2xl border border-red-900/60 bg-zinc-900 p-5 sm:p-7"
+          className="mt-6 rounded-2xl border border-rose-200 bg-rose-50/40 p-5 shadow-sm sm:p-7"
         >
           <h2
             id="history-delete-title"
-            className="text-xl font-semibold"
+            className="text-xl font-bold text-rose-950"
           >
             Hapus Riwayat
           </h2>
 
-          <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+          <p className="mt-2 text-sm leading-relaxed text-rose-900/70">
             Hapus seluruh riwayat pemeriksaan URL yang tersimpan
             pada browser ini. Tindakan ini tidak dapat dibatalkan.
           </p>
@@ -332,7 +307,7 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={handleClearHistory}
-            className="mt-5 rounded-xl border border-red-800 px-5 py-3 text-sm font-medium text-red-300 transition hover:bg-red-950/50 focus:outline-none focus:ring-2 focus:ring-red-400"
+            className="mt-5 rounded-xl border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-400"
           >
             Hapus Semua Riwayat
           </button>

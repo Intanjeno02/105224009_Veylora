@@ -9,24 +9,24 @@ type StatCardProps = {
 
 const colorStyles = {
   blue: {
-    icon: "bg-blue-500/10 text-blue-400",
-    value: "text-blue-400",
-    status: "border-blue-500/30 text-blue-400",
+    icon: "bg-purple-50 text-purple-700",
+    value: "text-purple-950",
+    status: "border-purple-200 bg-purple-50 text-purple-800",
   },
   red: {
-    icon: "bg-rose-500/10 text-rose-400",
-    value: "text-rose-400",
-    status: "border-rose-500/30 text-rose-400",
+    icon: "bg-rose-50 text-rose-600",
+    value: "text-rose-600",
+    status: "border-rose-200 bg-rose-50 text-rose-700",
   },
   amber: {
-    icon: "bg-amber-500/10 text-amber-400",
-    value: "text-amber-400",
-    status: "border-amber-500/30 text-amber-400",
+    icon: "bg-amber-50 text-amber-600",
+    value: "text-amber-600",
+    status: "border-amber-200 bg-amber-50 text-amber-700",
   },
   purple: {
-    icon: "bg-purple-500/10 text-purple-400",
-    value: "text-purple-400",
-    status: "border-purple-500/30 text-purple-400",
+    icon: "bg-purple-100/70 text-purple-700",
+    value: "text-purple-900",
+    status: "border-purple-200 bg-purple-50 text-purple-800",
   },
 };
 
@@ -43,10 +43,10 @@ export default function StatCard({
   return (
     <section
       aria-label={title}
-      className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition hover:border-zinc-700"
+      className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm transition hover:border-purple-300 hover:shadow-md"
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-medium text-zinc-400">{title}</h2>
+        <h2 className="text-sm font-medium text-purple-900/70">{title}</h2>
 
         <span
           aria-hidden="true"
@@ -66,7 +66,7 @@ export default function StatCard({
         </span>
       </div>
 
-      <p className="mt-3 text-xs leading-relaxed text-zinc-400">
+      <p className="mt-3 text-xs leading-relaxed text-purple-900/60">
         {description}
       </p>
     </section>
