@@ -33,10 +33,19 @@ const EMPTY_URLS: { id: string; url: string; domain: string; status: string; des
 
 export default function DashboardPage() {
   const pathname = usePathname();
+  if (new URLSearchParams(window.location.search).get("test-error") === "true") {
+  throw new Error("Pengujian error.tsx");
+    }
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotification, setShowNotification] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<DashboardAccount[]>([]);
+  const [testError, setTestError] = useState(false);
+
+  // Pengujian error.tsx (hapus bagian ini untuk menghilangkan tombol uji reror)
+  if (testError) {
+  throw new Error("Pengujian error.tsx");
+    }
 
   // Ambil akun dari localStorage yang juga dipakai oleh halaman Vault.
   useEffect(() => {
@@ -318,6 +327,12 @@ export default function DashboardPage() {
 
         {/* Main Content Area (<main>) */}
         <main className="flex-1 min-w-0 py-6 px-4 sm:px-6 lg:px-8 space-y-6 pb-28 md:pb-8">
+            <button
+                onClick={() => setTestError(true)}
+                className="rounded-xl bg-red-600 px-4 py-2 text-white"
+            >
+                Uji Error
+            </button>
           {/* HERO SECTION */}
           <section
             aria-label="Hero Banner"

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { addScanHistory } from "@/lib/history-storage";
+import { checkUrlSchema } from "@/lib/schemas/check-url-schema";
 
 type ScanResult = {
   url: string;
@@ -68,76 +69,45 @@ export default function CheckUrlPage() {
   const [error, setError] = useState("");
   const [isChecking, setIsChecking] = useState(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
 
-    setError("");
-    setResult(null);
+  setError("");
+  setResult(null);
 
-    const input = url.trim();
+  const validation = checkUrlSchema.safeParse(url);
 
-    if (!input) {
-      setError("Masukkan URL yang ingin diperiksa.");
-      return;
-    }
+  if (!validation.success) {
+    setError(validation.error.issues[0]?.message ?? "URL tidak valid.");
+    return;
+  }
 
-    let parsedUrl: URL;
+  const parsedUrl = new URL(validation.data);
 
+  setIsChecking(true);
+
+  // Simulasi pemeriksaan lokal, bukan pemindaian keamanan sungguhan.
+  window.setTimeout(() => {
     try {
-      parsedUrl = new URL(input);
+      const scanResult = analyzeUrl(parsedUrl.href);
+
+      // Simpan hasil pemeriksaan ke riwayat browser.
+      addScanHistory({
+        url: scanResult.url,
+        status: scanResult.status,
+        reasons: scanResult.reasons,
+        checkedAt: scanResult.checkedAt,
+      });
+
+      // Tampilkan hasil pemeriksaan.
+      setResult(scanResult);
     } catch {
-      setError(
-        "Format URL tidak valid. Masukkan URL lengkap, misalnya https://example.com."
-      );
-      return;
+      setError("URL tidak dapat diproses atau gagal disimpan.");
+    } finally {
+      setIsChecking(false);
     }
-
-    if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-      setError("URL harus menggunakan protokol HTTP atau HTTPS.");
-      return;
-    }
-
-    if (
-      !parsedUrl.hostname ||
-      !parsedUrl.hostname.includes(".") ||
-      parsedUrl.hostname.startsWith(".") ||
-      parsedUrl.hostname.endsWith(".")
-    ) {
-      setError("Nama host URL tidak valid.");
-      return;
-    }
-
-    if (parsedUrl.username || parsedUrl.password) {
-      setError(
-        "URL tidak boleh berisi username atau password. Hapus informasi tersebut sebelum melanjutkan."
-      );
-      return;
-    }
-
-    setIsChecking(true);
-
-    // Simulasi pemeriksaan lokal, bukan pemindaian keamanan sungguhan.
-    window.setTimeout(() => {
-  try {
-    const scanResult = analyzeUrl(parsedUrl.href);
-
-    // Simpan hasil pemeriksaan ke riwayat browser.
-    addScanHistory({
-      url: scanResult.url,
-      status: scanResult.status,
-      reasons: scanResult.reasons,
-      checkedAt: scanResult.checkedAt,
-    });
-
-    // Tampilkan hasil pemeriksaan.
-    setResult(scanResult);
-  } catch {
-    setError("URL tidak dapat diproses atau gagal disimpan.");
-  } finally {
-    setIsChecking(false);
-  }
-}, 500);
-  }
+  }, 500);
+}
 
   function resetForm() {
     setUrl("");

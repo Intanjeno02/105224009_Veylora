@@ -73,8 +73,8 @@ Repositori :
 ![local storage](Local_Storage.png)
 Pemeriksaan pada tab Network menunjukkan bahwa request dokumen halaman Cek URL tidak memiliki header Set-Cookie. Hal ini sesuai dengan implementasi saat ini yang belum menggunakan cookie sesi server.
   
-
 - Hasil uji: cookie palsu, logout, cookie lama setelah logout
+
 
  ### Hasil Uji: Cookie Palsu, Logout, dan Cookie Lama Setelah Logout
 
