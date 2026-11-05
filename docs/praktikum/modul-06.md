@@ -122,13 +122,12 @@ File migrasi sudah tersedia dan sesuai dengan relasi di skema. Namun, status pen
 ## 3. Seed dan Prisma Client
 
 ### Seed
-Belum ditemukan file seed, konfigurasi seed, maupun perintah seed di `package.json`, jadi seed belum tersedia.
 
-Pengujian seed dua kali belum bisa dilakukan. Jika seed ditambahkan, gunakan operasi idempoten seperti `upsert` agar pengulangan tidak membuat data duplikat.
+Proyek ini memang tidak memakai seed. Data user dibuat saat pengguna mendaftar melalui halaman registrasi, jadi database tidak perlu diisi dengan akun tetap sebelum aplikasi digunakan. Saat registrasi, endpoint membuat data `User` sekaligus `UserSettings` melalui Prisma. Cara ini juga menghindari pembuatan akun demo atau data contoh yang tidak diperlukan di database. Migrasi tetap diperlukan untuk membuat struktur tabelnya; seed dan migrasi punya fungsi yang berbeda.
 
 | Percobaan | Keluaran aktual |
 |---|---|
-| Seed pertama dan kedua | Belum diuji; file dan konfigurasi seed belum tersedia. |
+| Menjalankan seed | Tidak dilakukan dan tidak diperlukan; data dibuat melalui registrasi. |
 
 ### Prisma Client
 
