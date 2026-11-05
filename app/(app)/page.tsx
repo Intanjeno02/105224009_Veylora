@@ -33,7 +33,7 @@ const EMPTY_URLS: { id: string; url: string; domain: string; status: string; des
 
 export default function DashboardPage() {
   const pathname = usePathname();
-  if (new URLSearchParams(window.location.search).get("test-error") === "true") {
+  if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("test-error") === "true") {
   throw new Error("Pengujian error.tsx");
     }
   const [searchQuery, setSearchQuery] = useState("");
