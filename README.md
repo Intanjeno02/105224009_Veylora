@@ -198,3 +198,37 @@ Pengujian dijalankan secara otomatis melalui script pengujian terpadu `scripts/r
    npm run dev
    ```
    Aplikasi dapat diakses melalui peramban di `http://localhost:3000`. Akun demo pengujian sintetis: `demouser_veylora`.
+
+
+---
+
+## 8. Implementasi Kriptografi: Enkripsi Terautentikasi (AEAD AES-256-GCM) pada Vault
+
+Fitur **Vault** Veylora menerapkan standar kriptografi modern **Authenticated Encryption with Associated Data (AEAD)** berbasis algoritma **AES-256-GCM** untuk melindungi seluruh kata sandi akun digital pengguna di peramban:
+
+### A. Arsitektur Kriptografi & Pengelolaan Kunci
+1. **Algoritma Simetris**: AES-256 dalam mode Galois/Counter Mode (GCM).
+2. **Kunci Enkripsi (256-bit)**: Diderivasi dari master password pengguna menggunakan **PBKDF2-HMAC-SHA256** dengan **600.000 iterasi** dan salt acak 128-bit CSPRNG. Objek `CryptoKey` bersifat *non-extractable* dan hanya disimpan di memori volatil komponen selama sesi brankas terbuka.
+3. **Nonce / IV (96-bit)**: Dihasilkan secara independen menggunakan CSPRNG (`crypto.getRandomValues`) untuk setiap operasi enkripsi guna menjamin sifat *semantically secure* (IND-CPA) dan mencegah *nonce-reuse attack*.
+4. **Authentication Tag (128-bit)**: Dihitung menggunakan perkalian Galois field $GF(2^{128})$ untuk memverifikasi keutuhan ciphertext.
+5. **Associated Authenticated Data (AAD)**: Mengikat metadata akun (`accountId`, `userId`, dan `version`) secara kriptografis ke ciphertext. Memindahkan ciphertext ke entri lain (*Cut-and-Paste Attack*) akan menggagalkan dekripsi secara otomatis.
+6. **Prinsip Fail-Closed**: Setiap kegagalan integritas (modifikasi ciphertext, pemalsuan tag, atau kesalahan kunci) seketika membatalkan operasi tanpa membocorkan data plaintext.
+
+### B. Menjalankan Pengujian Otomatis Kriptografi
+Untuk menjalankan 10 skenario pengujian AEAD (termasuk deteksi bit-flipping, pemalsuan tag, wrong key, context swapping, dan kompatibilitas mundur Tugas 1):
+```bash
+npx tsx scripts/run-crypto-tests.ts
+```
+
+| ID Pengujian | Fokus Pengujian | Status Hasil |
+|:---:|:---|:---:|
+| **CRYPTO-01** | Enkripsi Plaintext Valid (AEAD AES-256-GCM v2) | **PASS** |
+| **CRYPTO-02** | Dekripsi Ciphertext Valid (Kesesuaian 100%) | **PASS** |
+| **CRYPTO-03** | Deteksi Modifikasi Bit Ciphertext (Bit-Flipping) | **PASS (Ditolak)** |
+| **CRYPTO-04** | Deteksi Pemalsuan Authentication Tag Galois MAC | **PASS (Ditolak)** |
+| **CRYPTO-05** | Penolakan Kunci Salah (Wrong Key Protection) | **PASS (Ditolak)** |
+| **CRYPTO-06** | Deteksi Modifikasi Nilai Nonce / IV | **PASS (Ditolak)** |
+| **CRYPTO-07** | Deteksi Context Swapping AAD (Cut-and-Paste Defense) | **PASS (Ditolak)** |
+| **CRYPTO-08** | Validasi Format Skema Payload Zod | **PASS (Ditolak)** |
+| **CRYPTO-09** | Keunikan Nonce CSPRNG (Nonce Freshness & IND-CPA) | **PASS** |
+| **CRYPTO-10** | Kompatibilitas Mundur & Integrasi Komponen Tugas 1 (v1) | **PASS** |
