@@ -163,7 +163,7 @@ export default function LoginPage() {
         {/* Login Form */}
         <form
           noValidate
-          autoComplete="off"
+          autoComplete="on"
           onSubmit={handleSubmit}
           className="mt-7 space-y-5"
         >
@@ -181,7 +181,7 @@ export default function LoginPage() {
                 id="username"
                 name="username"
                 type="text"
-                autoComplete="off"
+                autoComplete="username"
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
@@ -237,7 +237,7 @@ export default function LoginPage() {
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                autoComplete="new-password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -397,4 +397,3 @@ export default function LoginPage() {
     </main>
   );
 }
-

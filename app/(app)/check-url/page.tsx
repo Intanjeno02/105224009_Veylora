@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { addScanHistory } from "@/lib/history-storage";
 import { checkUrlSchema } from "@/lib/schemas/check-url-schema";
+import { useUserId } from "@/components/UserIdContext";
 
 type ScanResult = {
   url: string;
@@ -64,6 +65,7 @@ function analyzeUrl(url: string): ScanResult {
 }
 
 export default function CheckUrlPage() {
+  const userId = useUserId();
   const [url, setUrl] = useState("");
   const [result, setResult] = useState<ScanResult | null>(null);
   const [error, setError] = useState("");
@@ -92,7 +94,7 @@ function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       const scanResult = analyzeUrl(parsedUrl.href);
 
       // Simpan hasil pemeriksaan ke riwayat browser.
-      addScanHistory({
+      addScanHistory(userId, {
         url: scanResult.url,
         status: scanResult.status,
         reasons: scanResult.reasons,

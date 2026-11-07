@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { hash } from "bcryptjs";
 import { Prisma } from "@/lib/generated/prisma/client";
 import prisma from "@/lib/prisma";
 import { createSession } from "@/lib/session";
+import { newPasswordSchema } from "@/lib/password-policy";
+import { hashPassword } from "@/lib/password-hashing";
+import { isPasswordBlocklisted } from "@/lib/password-blocklist";
 import { z } from "zod";
 
 const registerSchema = z.object({
@@ -16,10 +18,7 @@ const registerSchema = z.object({
       "Username hanya boleh berisi huruf, angka, dan underscore."
     ),
 
-  password: z
-    .string()
-    .min(8, "Password minimal 8 karakter.")
-    .max(72, "Password maksimal 72 karakter."),
+  password: newPasswordSchema,
 });
 
 export async function POST(request: Request) {
@@ -49,10 +48,12 @@ export async function POST(request: Request) {
     const username = validation.data.username.toLowerCase();
     const password = validation.data.password;
 
-    // Pastikan password tidak melebihi batas bcrypt
-    if (Buffer.byteLength(password, "utf8") > 72) {
+    if (isPasswordBlocklisted(password)) {
       return NextResponse.json(
-        { message: "Ukuran password maksimal 72 byte." },
+        {
+          message:
+            "Password ini terlalu umum atau pernah diketahui dalam kebocoran data. Silakan pilih password lain.",
+        },
         { status: 400 }
       );
     }
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
     }
 
     // Hash password sebelum disimpan
-    const passwordHash = await hash(password, 12);
+    const passwordHash = await hashPassword(password);
 
     // Buat User dan UserSettings sekaligus
     const user = await prisma.user.create({

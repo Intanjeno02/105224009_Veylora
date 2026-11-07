@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { Account } from "@/data/account";
-import { getAccounts, saveAccounts } from "@/lib/account-storage";
+import {
+  getAccounts,
+  getAccountsStorageKey,
+  saveAccounts,
+} from "@/lib/account-storage";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
+import { useUserId } from "@/components/UserIdContext";
 import AccountCard from "@/components/AccountCard";
 import SearchInput from "@/components/SearchInput";
 
@@ -23,13 +28,15 @@ const emptyForm: AccountForm = {
   category: "Lainnya",
 };
 const EMPTY_ACCOUNTS: Account[] = [];
-const ACCOUNTS_STORAGE_KEY = "personal-security-accounts";
 
 export default function VaultPage() {
+  const userId = useUserId();
+  const storageKey = getAccountsStorageKey(userId);
+  const loadAccounts = useCallback(() => getAccounts(userId), [userId]);
   const { value: accounts } = useLocalStorageValue(
-    ACCOUNTS_STORAGE_KEY,
+    storageKey,
     EMPTY_ACCOUNTS,
-    getAccounts
+    loadAccounts
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -98,7 +105,7 @@ export default function VaultPage() {
     const updatedAccounts = [...accounts, newAccount];
 
     try {
-      saveAccounts(updatedAccounts);
+      saveAccounts(userId, updatedAccounts);
       setForm(emptyForm);
       setShowForm(false);
       setSuccess("Akun berhasil ditambahkan.");
@@ -113,7 +120,7 @@ export default function VaultPage() {
     );
 
     try {
-      saveAccounts(updatedAccounts);
+      saveAccounts(userId, updatedAccounts);
       setSuccess("Akun berhasil dihapus.");
       setError("");
     } catch {

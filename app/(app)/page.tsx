@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getAccounts, getAccountsStorageKey } from "@/lib/account-storage";
+import { useLocalStorageValue } from "@/lib/use-local-storage-value";
+import { useUserId } from "@/components/UserIdContext";
 
 type StoredAccount = {
   id: string;
@@ -28,10 +31,17 @@ type DashboardAccount = {
   color: string;
 };
 
-const STORAGE_KEY = "personal-security-accounts";
 const EMPTY_URLS: { id: string; url: string; domain: string; status: string; description: string; time: string; badgeColor: string }[] = [];
 
 export default function DashboardPage() {
+  const userId = useUserId();
+  const storageKey = getAccountsStorageKey(userId);
+  const loadAccounts = useCallback(() => getAccounts(userId), [userId]);
+  const { value: storedAccounts } = useLocalStorageValue(
+    storageKey,
+    [],
+    loadAccounts
+  );
   const pathname = usePathname();
   if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("test-error") === "true") {
   throw new Error("Pengujian error.tsx");
@@ -39,7 +49,6 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotification, setShowNotification] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
-  const [accounts, setAccounts] = useState<DashboardAccount[]>([]);
   const [testError, setTestError] = useState(false);
 
   // Pengujian error.tsx (hapus bagian ini untuk menghilangkan tombol uji reror)
@@ -47,13 +56,10 @@ export default function DashboardPage() {
   throw new Error("Pengujian error.tsx");
     }
 
-  // Ambil akun dari localStorage yang juga dipakai oleh halaman Vault.
-  useEffect(() => {
-    const loadAccounts = () => {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const stored: StoredAccount[] = raw ? JSON.parse(raw) : [];
-        const mapped = stored.map((account, index): DashboardAccount => {
+  const accounts = useMemo(
+    () =>
+      (storedAccounts as StoredAccount[]).map(
+        (account, index): DashboardAccount => {
           const name = account.name || "Akun tanpa nama";
           const palette = [
             { color: "from-purple-600 to-indigo-700", badgeColor: "bg-purple-50 text-purple-800 border-purple-200", dotColor: "bg-purple-600" },
@@ -73,21 +79,10 @@ export default function DashboardPage() {
             initial: name.slice(0, 2).toUpperCase(),
             color: style.color,
           };
-        });
-        setAccounts(mapped);
-      } catch {
-        setAccounts([]);
-      }
-    };
-
-    loadAccounts();
-    window.addEventListener("storage", loadAccounts);
-    window.addEventListener("focus", loadAccounts);
-    return () => {
-      window.removeEventListener("storage", loadAccounts);
-      window.removeEventListener("focus", loadAccounts);
-    };
-  }, []);
+        }
+      ),
+    [storedAccounts]
+  );
 
   const filteredAccounts = accounts.filter(
     (acc) =>

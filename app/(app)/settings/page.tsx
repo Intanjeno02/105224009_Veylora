@@ -10,11 +10,14 @@ import {
 import {
   clearScanHistory,
 } from "@/lib/history-storage";
+import { importLegacyLocalData } from "@/lib/legacy-local-data-import";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
+import { useUserId } from "@/components/UserIdContext";
 
 const SETTINGS_STORAGE_KEY = "veylora-settings";
 
 export default function SettingsPage() {
+  const userId = useUserId();
   const { value: settings, isLoaded } = useLocalStorageValue(
     SETTINGS_STORAGE_KEY,
     DEFAULT_SETTINGS,
@@ -29,16 +32,19 @@ export default function SettingsPage() {
     );
   }
 
-  return <SettingsContent initialSettings={settings} />;
+  return <SettingsContent initialSettings={settings} userId={userId} />;
 }
 
 function SettingsContent({
   initialSettings,
+  userId,
 }: {
   initialSettings: AppSettings;
+  userId: string;
 }) {
   const [settings, setSettings] = useState(initialSettings);
   const [message, setMessage] = useState("");
+  const [legacyImportMessage, setLegacyImportMessage] = useState("");
 
   function updateSettings(
     key: keyof AppSettings,
@@ -80,8 +86,37 @@ function SettingsContent({
       return;
     }
 
-    clearScanHistory();
+    clearScanHistory(userId);
     setMessage("Riwayat pemeriksaan berhasil dihapus.");
+  }
+
+  function handleImportLegacyData() {
+    const confirmed = window.confirm(
+      "Data Vault dan riwayat lama tidak memiliki identitas pemilik. Pastikan data tersebut memang milik akun ini sebelum mengimpor. Data sumber lama tidak akan dihapus. Lanjutkan?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const result = importLegacyLocalData(userId);
+
+      if (result.status === "already-imported") {
+        setLegacyImportMessage("Data lama sudah pernah diimpor ke akun ini.");
+      } else if (result.status === "nothing-to-import") {
+        setLegacyImportMessage("Tidak ada data lama untuk diimpor.");
+      } else {
+        setLegacyImportMessage(
+          `Impor terverifikasi: ${result.accountsImported} akun Vault dan ${result.historyImported} riwayat baru. Data sumber lama tetap disimpan.`
+        );
+      }
+    } catch (error) {
+      console.error("Legacy local data import error:", error);
+      setLegacyImportMessage(
+        "Impor gagal atau tidak dapat diverifikasi. Data sumber lama tetap disimpan."
+      );
+    }
   }
 
   return (
@@ -251,6 +286,36 @@ function SettingsContent({
                 menyimpan kata sandi asli atau informasi sensitif
                 dalam penyimpanan browser biasa.
               </p>
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+              <h3 className="font-bold text-amber-950">
+                Impor data lokal lama
+              </h3>
+
+              <p className="mt-2 text-sm leading-relaxed text-amber-900/90">
+                Data Vault dan riwayat lama tidak menyimpan identitas
+                pemilik. Impor hanya jika kamu yakin data tersebut
+                memang milik akun ini. Data lama tidak akan dihapus.
+              </p>
+
+              <button
+                type="button"
+                onClick={handleImportLegacyData}
+                className="mt-4 rounded-xl border border-amber-300 bg-white px-5 py-3 text-sm font-semibold text-amber-900 transition hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              >
+                Impor Data Lama ke Akun Ini
+              </button>
+
+              {legacyImportMessage && (
+                <p
+                  role="status"
+                  aria-live="polite"
+                  className="mt-3 text-sm font-medium text-amber-950"
+                >
+                  {legacyImportMessage}
+                </p>
+              )}
             </div>
           </section>
 

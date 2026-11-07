@@ -8,15 +8,21 @@ export type ScanHistory = {
   checkedAt: string;
 };
 
-const STORAGE_KEY = "veylora-url-history";
+export const LEGACY_HISTORY_STORAGE_KEY = "veylora-url-history";
 
-export function getScanHistory(): ScanHistory[] {
+export function getScanHistoryStorageKey(userId: string): string {
+  return `veylora_history_${userId}`;
+}
+
+export function getScanHistory(userId: string): ScanHistory[] {
   if (typeof window === "undefined") {
     return [];
   }
 
   try {
-    const savedData = localStorage.getItem(STORAGE_KEY);
+    const savedData = localStorage.getItem(
+      getScanHistoryStorageKey(userId)
+    );
 
     if (!savedData) {
       return [];
@@ -35,23 +41,23 @@ export function getScanHistory(): ScanHistory[] {
 }
 
 export function saveScanHistory(
+  userId: string,
   history: ScanHistory[]
 ): void {
   if (typeof window === "undefined") {
     return;
   }
 
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(history)
-  );
-  notifyLocalStorageChange(STORAGE_KEY);
+  const storageKey = getScanHistoryStorageKey(userId);
+  localStorage.setItem(storageKey, JSON.stringify(history));
+  notifyLocalStorageChange(storageKey);
 }
 
 export function addScanHistory(
+  userId: string,
   entry: Omit<ScanHistory, "id">
 ): ScanHistory[] {
-  const currentHistory = getScanHistory();
+  const currentHistory = getScanHistory(userId);
 
   const newEntry: ScanHistory = {
     ...entry,
@@ -63,16 +69,17 @@ export function addScanHistory(
     ...currentHistory,
   ];
 
-  saveScanHistory(updatedHistory);
+  saveScanHistory(userId, updatedHistory);
 
   return updatedHistory;
 }
 
-export function clearScanHistory(): void {
+export function clearScanHistory(userId: string): void {
   if (typeof window === "undefined") {
     return;
   }
 
-  localStorage.removeItem(STORAGE_KEY);
-  notifyLocalStorageChange(STORAGE_KEY);
+  const storageKey = getScanHistoryStorageKey(userId);
+  localStorage.removeItem(storageKey);
+  notifyLocalStorageChange(storageKey);
 }

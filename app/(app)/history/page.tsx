@@ -1,15 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   clearScanHistory,
   getScanHistory,
+  getScanHistoryStorageKey,
   type ScanHistory,
 } from "@/lib/history-storage";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
+import { useUserId } from "@/components/UserIdContext";
 
 const EMPTY_HISTORY: ScanHistory[] = [];
-const HISTORY_STORAGE_KEY = "veylora-url-history";
 
 type HistoryFilter =
   | "Semua"
@@ -17,10 +18,13 @@ type HistoryFilter =
   | "Perlu Diperiksa";
 
 export default function HistoryPage() {
+  const userId = useUserId();
+  const storageKey = getScanHistoryStorageKey(userId);
+  const loadHistory = useCallback(() => getScanHistory(userId), [userId]);
   const { value: history, isLoaded } = useLocalStorageValue(
-    HISTORY_STORAGE_KEY,
+    storageKey,
     EMPTY_HISTORY,
-    getScanHistory
+    loadHistory
   );
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<HistoryFilter>("Semua");
@@ -47,7 +51,7 @@ export default function HistoryPage() {
       return;
     }
 
-    clearScanHistory();
+    clearScanHistory(userId);
   }
 
   return (

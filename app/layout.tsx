@@ -27,6 +27,8 @@ return (
 <html
 lang="id"
 className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
-> <body className="min-h-full">{children}</body> </html>
+>
+<body className="min-h-full">{children}</body>
+</html>
 );
 }

@@ -1,0 +1,51 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: veylora-app:latest
+    user: "1001:1001"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/.next/cache
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      - DATABASE_URL=postgresql://veylora_app:fe1f2d34602dbb0c7bd625a3c1642d8555f4d23b2b9f5b00328036224c49eb97@db:5432/veylora_db?schema=public
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    # Tanpa "ports": basis data hanya dijangkau melalui jaringan internal Docker Compose
+    environment:
+      POSTGRES_DB: veylora_db
+      POSTGRES_USER: veylora_app
+      POSTGRES_PASSWORD: fe1f2d34602dbb0c7bd625a3c1642d8555f4d23b2b9f5b00328036224c49eb97
+    volumes:
+      - veylora_pgdata:/var/lib/postgresql/data
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  veylora_pgdata:
+

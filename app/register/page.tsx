@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
+import { newPasswordSchema } from "@/lib/password-policy";
 
 const registerSchema = z
   .object({
@@ -15,10 +16,7 @@ const registerSchema = z
         /^[a-zA-Z0-9_]+$/,
         "Username hanya boleh berisi huruf, angka, dan underscore."
       ),
-    password: z
-      .string()
-      .min(8, "Password minimal 8 karakter.")
-      .max(72, "Password maksimal 72 karakter."),
+    password: newPasswordSchema,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -171,7 +169,7 @@ export default function RegisterPage() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          autoComplete="off"
+          autoComplete="on"
           className="mt-7 space-y-5"
         >
           {/* Username */}
@@ -187,7 +185,7 @@ export default function RegisterPage() {
               id="username"
               name="username"
               type="text"
-              autoComplete="off"
+              autoComplete="username"
               value={username}
               onChange={(e) => {
                 setUsername(e.target.value);

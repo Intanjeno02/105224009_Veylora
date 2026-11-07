@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifySessionToken } from "@/lib/session";
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const session = request.cookies.get("veylora_session")?.value;
+  const token = request.cookies.get("veylora_session")?.value;
+  const session = token ? await verifySessionToken(token) : null;
   const isAuthenticated = Boolean(session);
 
   // API login dan registrasi boleh diakses tanpa login
@@ -23,19 +25,26 @@ export function proxy(request: NextRequest) {
 
   if (!isAuthenticated && !isPublicPage) {
     if (pathname.startsWith("/api/")) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: "Silakan login terlebih dahulu." },
         { status: 401 }
       );
+
+      if (token) {
+        response.cookies.delete("veylora_session");
+      }
+
+      return response;
     }
 
-    return NextResponse.redirect(
-      new URL("/login", request.url)
-    );
-  }
+    const redirectUrl = new URL("/login", request.url);
+    const response = NextResponse.redirect(redirectUrl);
 
-  if (isAuthenticated && isPublicPage) {
-    return NextResponse.redirect(new URL("/", request.url));
+    if (token) {
+      response.cookies.delete("veylora_session");
+    }
+
+    return response;
   }
 
   return NextResponse.next();
