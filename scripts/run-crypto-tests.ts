@@ -57,7 +57,7 @@ async function runCryptoTestSuite() {
         id: "CRYPTO-01",
         name: "Enkripsi Plaintext Valid (AEAD AES-256-GCM)",
         objective: "Memastikan proses enkripsi menghasilkan payload terstruktur versi 2 dengan IV 96-bit dan Tag 128-bit.",
-        input: `Plaintext: "${samplePlaintext}", context: accountId=${contextA.accountId}`,
+        input: `Plaintext: "[SYNTHETIC_TEST_PLAINTEXT]", context: accountId=${contextA.accountId}`,
         expected: "Payload JSON v2 dibuat dengan IV 12-byte, Tag 16-byte, dan AAD terikat.",
         actual: `Berhasil. Version=${payload.version}, Alg=${payload.algorithm}, IV_Len=${fromBase64(payload.iv).length}B, Tag_Len=${fromBase64(payload.tag).length}B`,
         status: "PASS",
@@ -100,8 +100,8 @@ async function runCryptoTestSuite() {
         name: "Dekripsi Ciphertext Valid",
         objective: "Memverifikasi ciphertext yang sah dapat didekripsi kembali menjadi plaintext asli.",
         input: `Ciphertext v2 terikat pada context accountId=${contextA.accountId}`,
-        expected: `Plaintext kembali sama persis: "${samplePlaintext}"`,
-        actual: `Dekripsi sukses: "${decrypted}" (Kecocokan 100%)`,
+        expected: `Plaintext kembali sama persis dengan input sintetis.`,
+        actual: `Dekripsi sukses: 100% cocok dengan [SYNTHETIC_TEST_PLAINTEXT]`,
         status: "PASS",
       });
     } else {
@@ -226,8 +226,8 @@ async function runCryptoTestSuite() {
       id: "CRYPTO-05",
       name: "Penolakan Kunci Salah (Wrong Key Protection)",
       objective: "Memastikan dekripsi dengan kunci yang berasal dari master password yang salah ditolak.",
-      input: "Key dari password yang salah",
-      expected: "Dekripsi ditolak dengan pesan error fail-closed.",
+      input: "Key dari password salah [SYNTHETIC_WRONG_PASSWORD]",
+      expected: "Dekripsi ditolak karena verifikasi MAC gagal.",
       actual: `DITOLAK SESUAI EKSPEKTASI: "${error.message}"`,
       status: "PASS",
     });
@@ -404,9 +404,9 @@ async function runCryptoTestSuite() {
         id: "CRYPTO-10",
         name: "Integrasi Komponen Tugas 1 (Backward Compatibility v1)",
         objective: "Memastikan muatan terenkripsi dari komponen asli Tugas 1 dapat didekripsi dan dimigrasikan secara mulus di Tugas 2.",
-        input: `Muatan versi 1 hasil fungsi asli encryptText(): ${v1PayloadString.substring(0, 45)}...`,
-        expected: `Berhasil mendekripsi muatan format v1 menjadi plaintext: "${samplePlaintext}"`,
-        actual: `Integrasi berhasil. Plaintext terdekripsi: "${decryptedV1}" (Kompatibel 100%)`,
+        input: `Muatan versi 1 hasil fungsi asli encryptText(): ${v1PayloadString.substring(0, 30)}...`,
+        expected: `Berhasil mendekripsi muatan format v1 menjadi plaintext.`,
+        actual: `Integrasi berhasil. Plaintext terdekripsi cocok 100% dengan data uji sintetis Tugas 1.`,
         status: "PASS",
       });
     } else {
