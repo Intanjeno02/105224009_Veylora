@@ -25,6 +25,11 @@ const navItems = [
     icon: "◷",
   },
   {
+    name: "Kategori",
+    href: "/categories",
+    icon: "🏷",
+  },
+  {
     name: "Pengaturan",
     href: "/settings",
     icon: "⚙",

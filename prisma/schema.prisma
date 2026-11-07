@@ -16,6 +16,7 @@ model User {
 
   settings     UserSettings?
   sessions     Session[]
+  inspections  UrlInspection[]
 }
 
 model Session {
@@ -45,3 +46,36 @@ model LoginRateLimit {
   windowStartedAt DateTime  @default(now())
   blockedUntil    DateTime?
 }
+
+model SecurityCategory {
+  id          Int             @id @default(autoincrement())
+  name        String          @unique
+  severity    String          // "Tinggi" | "Sedang" | "Rendah" | "Aman"
+  description String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  inspections UrlInspection[]
+}
+
+model UrlInspection {
+  id          String           @id @default(cuid())
+  url         String
+  domain      String
+  status      String           // "Mencurigakan" | "Perlu Diperiksa" | "Aman"
+  reasons     String[]         @default([])
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  categoryId  Int
+  category    SecurityCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([status])
+}
+

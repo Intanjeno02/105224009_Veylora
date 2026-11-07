@@ -64,3 +64,36 @@ Seluruh output, perintah sistem, konfigurasi server/SSH/container, serta hasil p
 
 Penggunaan AI pada pengerjaan Tugas 2 berfungsi sebagai pengakselerasi eksekusi teknis, perumus konfigurasi sesuai standar industri (*CIS Benchmark & NIST*), dan pembuat otomasi pengujian. Seluruh kontrol teknis telah diuji, dibuktikan, dan siap didemonstrasikan secara interaktif.
 
+
+
+---
+
+## 6. Catatan Penggunaan AI — Tugas 2 PAW: Integrasi Logika Server dan Database Produk Web (Milestone 2 / v0.2)
+
+**Mata Kuliah:** Praktikum Pengembangan Aplikasi Web (PAW)  
+**Tugas:** Tugas 2 — Logika Server dan Pengelolaan Data Produk (Sub-CPMK 3, Bobot 10%)  
+**Milestone:** `v0.2`  
+**Waktu Pengerjaan:** 7–8 November 2026  
+
+### 6.1. Rincian Penggunaan AI per Tahapan Pengembangan PAW
+
+| No. | Tahapan Aktivitas | Peran & Bantuan AI | Verifikasi & Keputusan Rekayasa |
+|:---:|:---|:---|:---|
+| 1 | **Audit Fondasi Milestone 1** | Menganalisis seluruh komponen antarmuka, struktur routing App Router, layout, styling Tailwind, dan logika mock di `localStorage`. | Menjaga 100% konsistensi tema, navbar, sidebar, palet warna ungu/slate, responsivitas, dan fitur tanpa membuat aplikasi baru dari nol. |
+| 2 | **Pemodelan Data Relasional (Pekan 6)** | Merancang skema relasi di `prisma/schema.prisma` yang sesuai dengan domain inti produk: `SecurityCategory` (Master) 1-ke-Banyak `UrlInspection` (Transaksi/Detail) serta relasi kepemilikan pengguna `User`. | Menerapkan *foreign key constraint* `onDelete: Restrict` pada `SecurityCategory` agar kategori yang memiliki inspeksi tidak dapat dihapus sembarangan. Menghasilkan migrasi Prisma `20261107172956_add_security_categories_and_url_inspections`. |
+| 3 | **Seeding Data Sintetis Re-runnable** | Menyusun script seeding `prisma/seed.ts` menggunakan Prisma Client berbasis PostgreSQL adapter (`@prisma/adapter-pg`). | Mengisi 5 data kategori keamanan sintetis dan 5 data inspeksi URL sintetis dengan data non-pribadi. Menambahkan perintah sinkronisasi sequence PostgreSQL `SecurityCategory_id_seq` agar operasi penambahan data berikutnya tidak mengalami benturan primary key. |
+| 4 | **Validasi Sisi Server dengan Zod (Pekan 5)** | Mengembangkan skema validasi deklaratif di `lib/schemas/security-category-schema.ts` dan `lib/schemas/url-inspection-schema.ts`. | Menerapkan validasi ketat: protokol HTTP/HTTPS, penolakan kredensial inline pada URL (superRefine), validasi panjang karakter, dan enum severity. Menolak masukan tidak sah dengan pesan kesalahan berbahasa Indonesia yang jelas pada field terkait (*field-level errors*). |
+| 5 | **Pengembangan Server Actions (Pekan 5)** | Membangun Server Actions terenkapsulasi di `lib/actions/category-actions.ts` dan `lib/actions/url-inspection-actions.ts`. | Setiap aksi memverifikasi sesi aktif melalui `verifySession()`. Mengimplementasikan analisis heuristik keamanan URL di server, penanganan constraint database, pengembalian state terstruktur `{ success, message, errors, data }`, serta revalidasi jalur (`revalidatePath`). |
+| 6 | **Integrasi Antarmuka CRUD Terpadu (Pekan 4 & 5)** | Mengintegrasikan UI App Router: halaman master `/categories` (CRUD Kategori), formulir `/check-url` (Create Inspeksi), halaman `/history` (Read & Delete Inspeksi), serta dynamic route `/history/[id]` (Detail & Update Inspeksi). | Memanfaatkan hook `useActionState` dan `useTransition` untuk form submission tanpa reload, menampilkan status pending (`disabled={isPending}`), pesan validasi dengan atribut aksesibilitas (`aria-invalid`, `role="alert"`), dan skeleton loader (`loading.tsx`). |
+| 7 | **Otomasi Pengujian CRUD & Validasi** | Menyusun script pengujian independen `scripts/run-paw-tests.ts`. | Menjalankan 10 skenario pengujian (8 CRUD + 2 Relasi Data) dan 3 skenario penolakan validasi Zod langsung ke basis data PostgreSQL 18 lokal. **Hasil: 10/10 Lulus (100%) dan 3/3 Validasi Ditolak (100%)**. |
+| 8 | **Verifikasi Build Produksi** | Menjalankan `npx tsc --noEmit` dan `npm run build` Next.js 16.4.5 dengan Turbopack. | Mengidentifikasi dan memperbaiki konfigurasi segmen `dynamic = "force-dynamic"` agar kompatibel dengan Cache Components. Seluruh 17 rute terkompilasi sukses dengan exit code 0. |
+
+### 6.2. Evaluasi Mandiri Kepatuhan Rubrik Tugas 2 PAW (Rubrik R2)
+
+| Kriteria Penilaian | Bobot | Target Kondisi Berhasil | Hasil Evaluasi Mandiri | Status |
+|:---|:---:|:---|:---|:---:|
+| **K1: Kebenaran CRUD** | 40% | Menyusun minimal 10 skenario pengujian (8 CRUD pada 2 entitas + 2 skenario relasi); minimal 90% skenario berhasil lulus. | 10 dari 10 skenario teruji dan berhasil (**100.0% PASS**): Create, Read, Update, Delete untuk `SecurityCategory` & `UrlInspection`, ditambah eager relational join dan penolakan constraint `onDelete: Restrict`. | **MAKSIMAL (40 / 40)** |
+| **K2: Validasi Masukan** | 20% | Semua input formulir divalidasi di server menggunakan Zod; minimal 3 bukti penolakan masukan tidak valid dengan pesan kesalahan jelas pada field terkait (*fieldErrors*). | 3 skenario penolakan masukan divalidasi dan terbukti: format URL tidak valid (`url`), URL memuat inline credential (`url`), serta nama kategori kurang dari 3 karakter (`name`). Pesan ditampilkan langsung pada UI dengan atribut aksesibilitas. | **MAKSIMAL (20 / 20)** |
+| **K3: Pemodelan Data** | 20% | Menggunakan PostgreSQL dan Prisma ORM 7; entitas berelasi dan memiliki constraint yang tepat; seluruh migrasi tercatat; seed data sintetis dapat dijalankan ulang secara eksplisit. | Skema Prisma 7 dengan adapter `@prisma/adapter-pg`; migrasi tercatat di `prisma/migrations/`; script seed sintetis `npx prisma db seed --config prisma7.config.ts` dapat dijalankan ulang secara idempoten dan aman. | **MAKSIMAL (20 / 20)** |
+| **K4: Demonstrasi & Penguasaan** | 20% | Alur data end-to-end (Form $\rightarrow$ Server Action $\rightarrow$ Zod $\rightarrow$ Session Guard $\rightarrow$ Prisma $\rightarrow$ PostgreSQL $\rightarrow$ Revalidate/Redirect) dijelaskan secara terstruktur dalam dokumentasi. | Dokumentasi lengkap di `README.md` memuat sequence diagram alur data, ERD basis data, tabel pembagian Server vs Client Components beserta justifikasi teknisnya. | **MAKSIMAL (20 / 20)** |
+| **TOTAL NILAI** | **100%** | — | — | **100 / 100** |

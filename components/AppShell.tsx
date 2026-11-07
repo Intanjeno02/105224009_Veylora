@@ -11,6 +11,7 @@ const navItems = [
   { name: "Vault", href: "/vault" },
   { name: "Cek URL", href: "/check-url" },
   { name: "Riwayat", href: "/history" },
+  { name: "Kategori", href: "/categories" },
   { name: "Pengaturan", href: "/settings" },
   { name: "Uji Dynamic Route", href: "/uji-dynamic-route" },
 ];
