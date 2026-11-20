@@ -1,9 +1,10 @@
 # Dokumen Teknis Modul 7 — Debugging dan Telaah Kode
 
-Nama/NIM   : Intan Rhevita Arselina Suryana / 105224009
-Repositori : 105224009_Veylora
-Branch     : `praktikum-pemweb`  
-Hash Awal  : `1f5b9868502f73c21a05e01aa3c9d425acccaa9f` (Baseline branch `praktikum-pemweb`)  
+Nama/NIM     : Intan Rhevita Arselina Suryana / 105224009
+Repositori   : 105224009_Veylora
+Branch       : `praktikum-pemweb`  
+Hash Awal    : `1f5b9868502f73c21a05e01aa3c9d425acccaa9f` (Baseline branch `praktikum-pemweb`)  
+Pull Request : https://github.com/Intanjeno02/105224009_Veylora/pull/1  
 
 ---
 
