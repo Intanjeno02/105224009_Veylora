@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 
 export default function Error({
   error,
@@ -24,12 +25,20 @@ export default function Error({
           Maaf, halaman gagal dimuat. Silakan coba lagi.
         </p>
 
-        <button
-          onClick={() => reset()}
-          className="mt-6 rounded-xl bg-purple-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-purple-500"
-        >
-          Coba Lagi
-        </button>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row justify-center">
+          <button
+            onClick={() => reset()}
+            className="rounded-xl bg-purple-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 shadow-md shadow-purple-900/30"
+          >
+            Coba Lagi
+          </button>
+          <Link
+            href="/"
+            className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:bg-white/10"
+          >
+            Kembali ke Beranda
+          </Link>
+        </div>
       </div>
     </div>
   );

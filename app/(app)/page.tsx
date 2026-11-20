@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getScanHistory, type ScanHistory } from "@/lib/history-storage";
 
 type StoredAccount = {
   id: string;
@@ -28,28 +29,50 @@ type DashboardAccount = {
   color: string;
 };
 
+type DashboardUrl = {
+  id: string;
+  url: string;
+  domain: string;
+  status: string;
+  description: string;
+  time: string;
+  badgeColor: string;
+};
+
 const STORAGE_KEY = "personal-security-accounts";
-const EMPTY_URLS: { id: string; url: string; domain: string; status: string; description: string; time: string; badgeColor: string }[] = [];
+
+function mapScanHistoryToDashboard(item: ScanHistory): DashboardUrl {
+  let domain = item.url;
+  try {
+    domain = new URL(item.url).hostname;
+  } catch {
+    domain = item.url;
+  }
+  const isSuspicious = item.status === "Mencurigakan";
+  return {
+    id: item.id,
+    url: item.url,
+    domain,
+    status: item.status,
+    description: isSuspicious ? "Indikator risiko terdeteksi" : "Lolos pemeriksaan dasar",
+    time: item.checkedAt ? new Date(item.checkedAt).toLocaleDateString("id-ID") : "Baru saja",
+    badgeColor: isSuspicious
+      ? "bg-rose-50 text-rose-800 border-rose-200"
+      : "bg-purple-50 text-purple-800 border-purple-200",
+  };
+}
 
 export default function DashboardPage() {
   const pathname = usePathname();
-  if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("test-error") === "true") {
-  throw new Error("Pengujian error.tsx");
-    }
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotification, setShowNotification] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<DashboardAccount[]>([]);
-  const [testError, setTestError] = useState(false);
+  const [urls, setUrls] = useState<DashboardUrl[]>([]);
 
-  // Pengujian error.tsx (hapus bagian ini untuk menghilangkan tombol uji reror)
-  if (testError) {
-  throw new Error("Pengujian error.tsx");
-    }
-
-  // Ambil akun dari localStorage yang juga dipakai oleh halaman Vault.
+  // Ambil data akun dan riwayat pemindaian URL dari localStorage
   useEffect(() => {
-    const loadAccounts = () => {
+    const loadDashboardData = () => {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         const stored: StoredAccount[] = raw ? JSON.parse(raw) : [];
@@ -78,14 +101,23 @@ export default function DashboardPage() {
       } catch {
         setAccounts([]);
       }
+
+      try {
+        const scanHistory = getScanHistory();
+        setUrls(scanHistory.map(mapScanHistoryToDashboard));
+      } catch {
+        setUrls([]);
+      }
     };
 
-    loadAccounts();
-    window.addEventListener("storage", loadAccounts);
-    window.addEventListener("focus", loadAccounts);
+    loadDashboardData();
+    window.addEventListener("storage", loadDashboardData);
+    window.addEventListener("focus", loadDashboardData);
+    window.addEventListener("veylora:storage-change", loadDashboardData);
     return () => {
-      window.removeEventListener("storage", loadAccounts);
-      window.removeEventListener("focus", loadAccounts);
+      window.removeEventListener("storage", loadDashboardData);
+      window.removeEventListener("focus", loadDashboardData);
+      window.removeEventListener("veylora:storage-change", loadDashboardData);
     };
   }, []);
 
@@ -96,13 +128,14 @@ export default function DashboardPage() {
       acc.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Riwayat URL akan kosong sampai fitur pemindaian benar-benar menyimpan hasil.
-  const filteredUrls = EMPTY_URLS.filter(
+  const filteredUrls = urls.filter(
     (item) =>
       item.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.domain.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.status.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const suspiciousCount = urls.filter((item) => item.status === "Mencurigakan").length;
 
   const navItems = [
     {
@@ -327,12 +360,6 @@ export default function DashboardPage() {
 
         {/* Main Content Area (<main>) */}
         <main className="flex-1 min-w-0 py-6 px-4 sm:px-6 lg:px-8 space-y-6 pb-28 md:pb-8">
-            <button
-                onClick={() => setTestError(true)}
-                className="rounded-xl bg-red-600 px-4 py-2 text-white"
-            >
-                Uji Error
-            </button>
           {/* HERO SECTION */}
           <section
             aria-label="Hero Banner"
@@ -513,14 +540,14 @@ export default function DashboardPage() {
               </div>
               <div className="mt-3 flex items-baseline justify-between">
                 <span className="text-3xl font-extrabold text-purple-950 tracking-tight">
-                  0
+                  {suspiciousCount}
                 </span>
                 <span className="text-[11px] font-semibold text-purple-800 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
                   Terdeteksi Phishing
                 </span>
               </div>
               <p className="mt-2 text-xs text-purple-900/60">
-                1 tautan berbahaya telah diamankan
+                {suspiciousCount > 0 ? `${suspiciousCount} tautan berbahaya telah diamankan` : "Belum ada URL berbahaya terdeteksi"}
               </p>
             </div>
           </section>
